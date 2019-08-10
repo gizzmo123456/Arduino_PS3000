@@ -54,10 +54,10 @@ const uint8_t TOTAL_INPUTS = 3;
 // inputs (0 = Left, 1 = Center, 2 = Right)
 uint16_t ldr[]    {0, 0, 0};
 uint16_t potent[] {0, 0, 0};
-uint8_t motor[]   {0, 0, 0};
+bool motor[]      {0, 0, 0};
 
 // outputs (0 = Left, 1 = Center, 2 = Right)
-uint8_t motor_active[]  {0, 0, 0};
+bool motor_active[]  {0, 0, 0};
 
 // Debug
 bool debug_serial = false;
