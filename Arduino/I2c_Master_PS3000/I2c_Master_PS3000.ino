@@ -1,4 +1,4 @@
-// Arduino UNO Master I2c.
+// Arduino UNO I2C Master.
 /* =======================================================================
  * Use the Arduino Uno as the master to contiunelesly send data to
  * a feather 32u4 RFMx (salve I2c) over the I2c.  
@@ -49,6 +49,17 @@
 // I2c
 #define I2C_SLAVE       0x08
 
+const uint8_t TOTAL_INPUTS = 3;
+
+// inputs (0 = Left, 1 = Center, 2 = Right)
+uint16_t ldr[]    {0, 0, 0};
+uint16_t potent[] {0, 0, 0};
+uint8_t motor[]   {0, 0, 0};
+
+// outputs (0 = Left, 1 = Center, 2 = Right)
+uint8_t motor_active[]  {0, 0, 0};
+
+// Debug
 bool debug_serial = false;
 
 void setup() {
@@ -78,15 +89,40 @@ void setup() {
 void loop() 
 {
 
+  read_inputs();
+  update_outputs();
+  send_message_to_slave();
+  serial_debug();
   
-  
-  // Last thing send the data over the i2c :D
+}
 
+void read_inputs()
+{
+  // LDR
+
+  // Potent
+
+  // Fire
+  
+}
+
+void update_outputs()
+{
+
+  // update fire outputs depending on inputs
+
+  // if any fire inputs sound alarm
+  
+}
+
+void send_message_to_slave()
+{
+  
 }
 
 // debug mode can only be accesed via USB serial.
 // send 'D' to turn serial debug on and 'd' to turn serial debug off. 
-void debug()
+void serial_debug()
 {
 
   if( Serial.available() > 0)
