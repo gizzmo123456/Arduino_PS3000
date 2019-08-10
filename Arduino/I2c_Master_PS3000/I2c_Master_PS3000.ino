@@ -27,9 +27,9 @@
 // The motor inputs can be replaced with by mesuring the paulse timeings
 // from a pwm pin. But this causes a lil bit of hanging around when the 
 // pin is low. But if we run out of pins it is an option :)
-#define MOTOR_L_INPUT  2 // Left     //HIGH is ACTIVE
-#define MOTOR_C_INPUT  3 // Center   //HIGH is ACTIVE
-#define MOTOR_R_INPUT  4 // Right    //HIGH is ACTIVE
+#define MOTOR_L_INPUT   2 // Left     //HIGH is ACTIVE
+#define MOTOR_C_INPUT   3 // Center   //HIGH is ACTIVE
+#define MOTOR_R_INPUT   4 // Right    //HIGH is ACTIVE
 
 #define MOTOR_L_OUTPUT  9
 #define MOTOR_C_OUTPUT  10
@@ -49,9 +49,11 @@
 // I2c
 #define I2C_SLAVE       0x08
 
+bool debug_serial = false;
+
 void setup() {
 
-  Serial.begin(19200);    // used for debugs.
+  Serial.begin(19200);    // used for debuging only via usb.
   Wire.begin();           // make this device our master
 
   //Set up pins.
@@ -76,6 +78,23 @@ void setup() {
 void loop() 
 {
 
+  
+  
   // Last thing send the data over the i2c :D
 
+}
+
+// debug mode can only be accesed via USB serial.
+// send 'D' to turn serial debug on and 'd' to turn serial debug off. 
+void debug()
+{
+
+  if( Serial.available() > 0)
+  {
+    byte incoming_byte = Serial.read();
+    if ( incoming_byte == 'd' || incoming_byte == 'D' )
+      debug_serial = incoming_byte == 'D';
+  }
+  
+  if( !debug_serial ) return;  
 }
