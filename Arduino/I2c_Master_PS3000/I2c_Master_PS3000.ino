@@ -27,9 +27,15 @@
 // The motor inputs can be replaced with by mesuring the paulse timeings
 // from a pwm pin. But this causes a lil bit of hanging around when the 
 // pin is low. But if we run out of pins it is an option :)
+// TODO:
+// insted of the motors each having an input and an out pin, it should be requested over
+// i2c every ~0.2secs and have the value cleared on the feather and and timed
+// on the Arduino UNO.  
 #define MOTOR_L_INPUT   2 // Left     //HIGH is ACTIVE
 #define MOTOR_C_INPUT   3 // Center   //HIGH is ACTIVE
 #define MOTOR_R_INPUT   4 // Right    //HIGH is ACTIVE
+
+#define UPDATE_MOTOR_INTERVALS  0.2f
 
 #define MOTOR_L_OUTPUT  9
 #define MOTOR_C_OUTPUT  10
@@ -92,6 +98,7 @@ void loop()
   read_inputs();
   update_outputs();
   send_message_to_slave();
+  request_date_from_slave();
   serial_debug();
   
 }
@@ -101,8 +108,6 @@ void read_inputs()
   // LDR
 
   // Potent
-
-  // Fire
   
 }
 
@@ -116,6 +121,11 @@ void update_outputs()
 }
 
 void send_message_to_slave()
+{
+  
+}
+
+void request_message_from_salve()
 {
   
 }
