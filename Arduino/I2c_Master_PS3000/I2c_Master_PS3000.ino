@@ -31,10 +31,8 @@
 // insted of the motors each having an input and an out pin, it should be requested over
 // i2c every ~0.2secs and have the value cleared on the feather and and timed
 // on the Arduino UNO.  
-#define MOTOR_L_INPUT   2 // Left     //HIGH is ACTIVE
-#define MOTOR_C_INPUT   3 // Center   //HIGH is ACTIVE
-#define MOTOR_R_INPUT   4 // Right    //HIGH is ACTIVE
 
+// TODO: sort out the comments above.
 #define MOTOR_UPDATE_INTERVALS  200
 
 #define MOTOR_L_OUTPUT  9
@@ -97,22 +95,12 @@ void setup() {
 void loop() 
 {
 
-  if( Serial.available() > 0)
-  {
-    int v = Serial.read() - 48;
-    if( v >= 0)
-      set_motors_active(v);
-    Serial.println("here.");
-  }
-  
-
-/*
   read_inputs();
   update_outputs();
   send_message_to_slave();
-  request_data_from_slave();
-  //serial_debug();
- */ 
+  //request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
+  serial_debug();
+  
 }
 
 void read_inputs()
@@ -163,8 +151,6 @@ void set_motors_active( int value )
   
   while ( motor_id >= 0 )
   {
-
-    Serial.println( value );
     
     if ( max_motor_value <= value )
     {
@@ -176,22 +162,11 @@ void set_motors_active( int value )
       motor_active[ motor_id ] = false;
     }
 
-    Serial.print( "motor " );
-    Serial.print( motor_id );
-    Serial.print( " : ");
-    Serial.print( max_motor_value );
-    Serial.print( " : ");
-    Serial.println( motor_active[ motor_id ] );
-    
     max_motor_value = max_motor_value >> 1;
     motor_id--;
 
-
-    
   }
 
-  Serial.println( "---#---"  );
-  
 }
 
 // debug mode can only be accesed via USB serial.
