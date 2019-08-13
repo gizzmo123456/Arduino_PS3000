@@ -35,7 +35,7 @@
 #define MOTOR_C_INPUT   3 // Center   //HIGH is ACTIVE
 #define MOTOR_R_INPUT   4 // Right    //HIGH is ACTIVE
 
-#define UPDATE_MOTOR_INTERVALS  0.2f
+#define MOTOR_UPDATE_INTERVALS  200
 
 #define MOTOR_L_OUTPUT  9
 #define MOTOR_C_OUTPUT  10
@@ -60,10 +60,10 @@ const uint8_t TOTAL_INPUTS = 3;
 // inputs (0 = Left, 1 = Center, 2 = Right)
 uint16_t ldr[]    {0, 0, 0};
 uint16_t potent[] {0, 0, 0};
-bool motor[]      {0, 0, 0};
 
 // outputs (0 = Left, 1 = Center, 2 = Right)
 bool motor_active[]  {0, 0, 0};
+unsigned long motor_next_update = MOTOR_UPDATE_INTERVALS;
 
 // Debug
 bool debug_serial = false;
@@ -89,18 +89,30 @@ void setup() {
   pinMode(POTENT_L_INPUT, INPUT);
   pinMode(POTENT_C_INPUT, INPUT);
   pinMode(POTENT_R_INPUT, INPUT);
+
+  Serial.println("go");
   
 }
 
 void loop() 
 {
 
+  if( Serial.available() > 0)
+  {
+    int v = Serial.read() - 48;
+    if( v >= 0)
+      set_motors_active(v);
+    Serial.println("here.");
+  }
+  
+
+/*
   read_inputs();
   update_outputs();
   send_message_to_slave();
-  request_date_from_slave();
-  serial_debug();
-  
+  request_data_from_slave();
+  //serial_debug();
+ */ 
 }
 
 void read_inputs()
@@ -125,8 +137,60 @@ void send_message_to_slave()
   
 }
 
-void request_message_from_salve()
+void request_data_from_slave()
 {
+
+  if ( millis() > motor_next_update ) return;
+
+  Wire.requestFrom( I2C_SLAVE, 1 );
+
+  int incoming_byte;
+
+  while( Wire.available() )
+  {
+    incoming_byte = Wire.read();
+  }
+
+  motor_next_update = millis() + MOTOR_UPDATE_INTERVALS;
+  
+}
+
+void set_motors_active( int value )
+{ // needs testing
+
+  int max_motor_value = 4;
+  int motor_id = 2;
+  
+  while ( motor_id >= 0 )
+  {
+
+    Serial.println( value );
+    
+    if ( max_motor_value <= value )
+    {
+      value -= max_motor_value;
+      motor_active[ motor_id ] = true;
+    }
+    else
+    {
+      motor_active[ motor_id ] = false;
+    }
+
+    Serial.print( "motor " );
+    Serial.print( motor_id );
+    Serial.print( " : ");
+    Serial.print( max_motor_value );
+    Serial.print( " : ");
+    Serial.println( motor_active[ motor_id ] );
+    
+    max_motor_value = max_motor_value >> 1;
+    motor_id--;
+
+
+    
+  }
+
+  Serial.println( "---#---"  );
   
 }
 
