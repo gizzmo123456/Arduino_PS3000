@@ -62,6 +62,7 @@ uint16_t potent[] {0, 0, 0};
 // outputs (0 = Left, 1 = Center, 2 = Right)
 bool motor_active[]  {0, 0, 0};
 unsigned long motor_next_update = MOTOR_UPDATE_INTERVALS;
+bool fire_alarm_is_active = false;
 
 // Debug
 bool debug_serial = false;
@@ -87,8 +88,6 @@ void setup() {
   pinMode(POTENT_L_INPUT, INPUT);
   pinMode(POTENT_C_INPUT, INPUT);
   pinMode(POTENT_R_INPUT, INPUT);
-
-  Serial.println("go");
   
 }
 
@@ -148,6 +147,7 @@ void set_motors_active( int value )
 
   int max_motor_value = 4;
   int motor_id = 2;
+  bool sound_alarm = false;
   
   while ( motor_id >= 0 )
   {
@@ -156,6 +156,7 @@ void set_motors_active( int value )
     {
       value -= max_motor_value;
       motor_active[ motor_id ] = true;
+      sound_alarm = true;
     }
     else
     {
@@ -166,6 +167,8 @@ void set_motors_active( int value )
     motor_id--;
 
   }
+
+  fire_alarm_is_active = sound_alarm;
 
 }
 
