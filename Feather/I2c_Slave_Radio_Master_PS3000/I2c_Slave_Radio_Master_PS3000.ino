@@ -3,6 +3,8 @@
  * =======================================================================
  */
 #include <Wire.h>
+#include <rfm_setup.h>
+#include <RH_RF69.h>
 
 #define I2C_ADDR 0x08
 
