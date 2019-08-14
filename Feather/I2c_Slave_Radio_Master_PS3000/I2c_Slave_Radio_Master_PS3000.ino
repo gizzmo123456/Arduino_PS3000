@@ -6,7 +6,12 @@
 #include <rfm_setup.h>
 #include <RH_RF69.h>
 
-#define I2C_ADDR 0x08
+#define I2C_ADDR      0x08
+
+#define MOTOR_L_VALUE 1
+#define MOTOR_C_VALUE 2
+#define MOTOR_R_VALUE 4
+
 
 void setup() 
 {
