@@ -35,9 +35,10 @@
 // TODO: sort out the comments above.
 #define MOTOR_UPDATE_INTERVALS  200
 
-#define MOTOR_L_OUTPUT  9
-#define MOTOR_C_OUTPUT  10
-#define MOTOR_R_OUTPUT  11
+#define MOTOR_L_OUTPUT    9
+#define MOTOR_C_OUTPUT    10
+#define MOTOR_R_OUTPUT    11
+#define MOTOR_REV_OUTPUT  12  // THIS PIN MUST ALWAYS BE LOW, otherwise the motors will run in reverse
 
 #define PIEZO_OUTPUT    6
 
@@ -80,7 +81,10 @@ void setup() {
   pinMode(MOTOR_L_OUTPUT, OUTPUT);
   pinMode(MOTOR_C_OUTPUT, OUTPUT);
   pinMode(MOTOR_R_OUTPUT, OUTPUT);
+  pinMode(MOTOR_REV_OUTPUT, OUTPUT);
 
+  pinMode(PIEZO_OUTPUT, OUTPUT);
+  
   pinMode(LDR_L_INPUT, INPUT);
   pinMode(LDR_C_INPUT, INPUT);
   pinMode(LDR_R_INPUT, INPUT);
@@ -88,6 +92,16 @@ void setup() {
   pinMode(POTENT_L_INPUT, INPUT);
   pinMode(POTENT_C_INPUT, INPUT);
   pinMode(POTENT_R_INPUT, INPUT);
+
+  // set all the outputs to LOW
+  // to insure that all the outputs are not active when the controller starts :D
+  digitalWrite(PIEZO_OUT, LOW);
+  
+  digitalWrite(MOTOR_L_OUTPUT, LOW);
+  digitalWrite(MOTOR_C_OUTPUT, LOW);
+  digitalWrite(MOTOR_R_OUTPUT, LOW);
+  
+  digitalWrite(MOTOR_REV_OUTPUT, LOW);
   
 }
 
@@ -113,9 +127,12 @@ void read_inputs()
 void update_outputs()
 {
 
-  // update fire outputs depending on inputs
-
-  // if any fire inputs sound alarm
+  // update fire feedback outputs
+  for( int i = 0; i < 3; i++)
+    digitalWrite(PIEZO_OUTPUT, motor_active[i]);
+  
+  // if any fire sound alarm
+  digitalWrite(PIEZO_OUTPUT, fire_alarm_is_active);
   
 }
 
