@@ -1,24 +1,25 @@
 // Arduino UNO I2C Master.
 /* =======================================================================
  * Use the Arduino Uno as the master to contiunelesly send data to
- * a feather 32u4 RFMx (salve I2c) over the I2c.  
+ * a feather 32u4 RFMx over the I2c (slave).  
  * The Feather Board is used to commuacate with a PC over Serial.
- * This config has be used sine the feather is a faster board than the UNO
+ * This config has be used since the feather is a faster board than the UNO
  * so we prevent any hanging/waiting.
  * Also because the feather also recives data over a radio from another
  * feather 32u4 RFMx. making it the central point between the 3 PCB's
  * =======================================================================
  * Moreover, The UNO is used for the direct visual & audio feedback to 
- * the player via a prezo speaker and 3 motors which blow ribon both as a 
+ * the player via a prezo speaker and 3 motors which blows ribon both as a 
  * means of fire feedback.
  * Also the UNO is responable for LDR inputs (pan on hob) 
  * and potentiometers inputs (temperture)
  * Altho the one of the set of inputs might get moved to the feather
  * We'll see.
  * =======================================================================
- * To detect if feedback should be On pins 2, 3, 4 will be HIGH
- * pin 2 is LHS motor (left to right) if any pins are HIGH the prezo
- * will be active :) (this might change so it is on none PWM pins)
+ * The Uno will request if any feedback should be applied every 200ms 
+ * (atm, see #define MOTOR_UPDATE_INTERVALS) over I2c
+ * motor L is 1, motor C is 2 and motor R is 4. theres numbers are added
+ * together and sent to the uno. if the number is 0 then they are all off
  */
 
 #include <Wire.h>
