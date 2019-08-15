@@ -12,6 +12,16 @@
 #define MOTOR_C_VALUE 2
 #define MOTOR_R_VALUE 4
 
+#define MOTOR_ACTIVE_TIME 20000   //ms (20sec)
+#define TOTAL_MOTORS 3
+
+// todo: send motor message.
+int motor_values[] {MOTOR_L_VALUE, MOTOR_C_VALUE, MOTOR_R_VALUE};
+float motor_end_times[] {0, 0, 0};
+int8_t motor_output_value = 0;
+
+
+bool debug_mode = false;
 
 void setup() 
 {
@@ -38,6 +48,38 @@ void loop()
 {
   // put your main code here, to run repeatedly:
 
+  read_serial();
+  
+  motor_output_value = get_motor_output_value();
+  
+  write_serial();
+  
+}
+
+void read_serial()
+{
+  // read all incoming bytes
+  while( Serial.available() > 0 )
+  {
+    char incoming_byte = Serial.read();
+    // A = left motor on, B = center motor, C = right motor
+    // 'A' is 65 in Ascii
+    if( incoming_byte - 65 >= 0 && incoming_byte - 65 < 3 )
+    {
+      int motor_id = incoming_byte - 65;  //motors 0, 1, 2
+      set_motor_active( motor_id );
+    }
+    else if( incoming_byte == 'd' || incomeing_byte == 'D' )
+    {
+      debug_mode = incomeing_byte == 'd';
+    }
+  }
+  
+}
+
+void write_serial()
+{
+  
 }
 
 void receive_i2c_event(int bytes)
@@ -58,4 +100,20 @@ void receive_radio_event(int bytes)
 void request_radio_event()
 {
   // debug only ? not needed ?
+}
+
+void set_motor_active( int mid )
+{
+  motor_end_times[mid] = millis() +  MOTOR_ACTIVE_TIME;
+}
+
+int get_motor_output_value()
+{
+  int output_value = 0;
+  
+  for ( int i = 0; i < TOTAL_MOTORS; i++ )
+    if( millis() < motor_end_times[ i ] )
+      output_value += motor_values[ i ];
+
+  return output_value;
 }
