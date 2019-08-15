@@ -127,12 +127,14 @@ void read_inputs()
 
 void update_outputs()
 {
-
+  
   // update fire feedback outputs
   
-  digitalWrite(MOTOR_L_OUTPUT, motor_active[0]);
-  digitalWrite(MOTOR_C_OUTPUT, motor_active[1]);
-  digitalWrite(MOTOR_R_OUTPUT, motor_active[2]);
+  digitalWrite(MOTOR_L_OUTPUT, (motor_active[0] ? HIGH : LOW) );
+  digitalWrite(MOTOR_C_OUTPUT, (motor_active[1] ? HIGH : LOW));
+  digitalWrite(MOTOR_R_OUTPUT, (motor_active[2] ? HIGH : LOW));
+
+  digitalWrite(MOTOR_REV_OUTPUT, LOW);
   
   // if any fire sound alarm
   digitalWrite(PIEZO_OUTPUT, fire_alarm_is_active);
@@ -160,7 +162,7 @@ int8_t request_data_from_slave()
   {
     incoming_byte = Wire.read();
   }
-  
+  Serial.println(incoming_byte);
   motor_next_update = millis() + MOTOR_UPDATE_INTERVALS;
 
   return incoming_byte;
