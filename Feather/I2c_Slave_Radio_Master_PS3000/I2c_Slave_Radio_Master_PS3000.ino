@@ -12,7 +12,7 @@
 #define MOTOR_C_VALUE 2
 #define MOTOR_R_VALUE 4
 
-#define MOTOR_ACTIVE_TIME 20000   //ms (20sec)
+#define MOTOR_ACTIVE_TIME 2000   //ms (20sec)
 #define TOTAL_MOTORS 3
 
 // todo: send motor message.
@@ -41,6 +41,7 @@ void setup()
   // using the serial.
   
   while( !Serial ) delay(1);
+  Serial.println(1);
   
 }
 
@@ -90,7 +91,10 @@ void receive_i2c_event(int bytes)
 void request_i2c_event()
 {
   if( debug_mode )
-    Serial.println("--Sending message over i2c");
+  {
+    Serial.println("--Sending message over i2c--");
+    Serial.println( motor_output_value );
+  }
   // send output
   Wire.write( motor_output_value );
 }
