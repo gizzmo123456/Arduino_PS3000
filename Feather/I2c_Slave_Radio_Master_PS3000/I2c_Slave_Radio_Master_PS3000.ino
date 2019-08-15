@@ -89,7 +89,10 @@ void receive_i2c_event(int bytes)
 
 void request_i2c_event()
 {
-  
+  if( debug_mode )
+    Serial.println("--Sending message over i2c");
+  // send output
+  Wire.write( motor_output_value );
 }
 
 void receive_radio_event(int bytes)
