@@ -112,7 +112,7 @@ void loop()
   read_inputs();
   update_outputs();
   send_message_to_slave();
-  //request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
+  request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
   serial_debug();
   
 }
