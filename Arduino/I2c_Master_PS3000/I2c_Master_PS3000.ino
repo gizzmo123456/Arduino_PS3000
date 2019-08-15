@@ -75,9 +75,6 @@ void setup() {
   Wire.begin();           // make this device our master
 
   //Set up pins.
-  pinMode(MOTOR_L_INPUT, INPUT);
-  pinMode(MOTOR_C_INPUT, INPUT);
-  pinMode(MOTOR_R_INPUT, INPUT);
 
   pinMode(MOTOR_L_OUTPUT, OUTPUT);
   pinMode(MOTOR_C_OUTPUT, OUTPUT);
