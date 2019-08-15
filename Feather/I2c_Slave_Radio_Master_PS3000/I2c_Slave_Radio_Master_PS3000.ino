@@ -69,9 +69,9 @@ void read_serial()
       int motor_id = incoming_byte - 65;  //motors 0, 1, 2
       set_motor_active( motor_id );
     }
-    else if( incoming_byte == 'd' || incomeing_byte == 'D' )
+    else if( incoming_byte == 'd' || incoming_byte == 'D' )
     {
-      debug_mode = incomeing_byte == 'd';
+      debug_mode = incoming_byte == 'd';
     }
   }
   
