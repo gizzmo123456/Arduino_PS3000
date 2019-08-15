@@ -109,7 +109,10 @@ void loop()
   read_inputs();
   update_outputs();
   send_message_to_slave();
-  request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
+  
+  int8_t motor_value = request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
+  set_motors_active( motor_value );
+  
   serial_debug();
   
 }
@@ -126,8 +129,10 @@ void update_outputs()
 {
 
   // update fire feedback outputs
-  for( int i = 0; i < 3; i++)
-    digitalWrite(PIEZO_OUTPUT, motor_active[i]);
+  
+  digitalWrite(MOTOR_L_OUTPUT, motor_active[0]);
+  digitalWrite(MOTOR_C_OUTPUT, motor_active[1]);
+  digitalWrite(MOTOR_R_OUTPUT, motor_active[2]);
   
   // if any fire sound alarm
   digitalWrite(PIEZO_OUTPUT, fire_alarm_is_active);
@@ -139,21 +144,26 @@ void send_message_to_slave()
   
 }
 
-void request_data_from_slave()
+int8_t request_data_from_slave()
 {
 
   if ( millis() > motor_next_update ) return;
 
+  if(debug_serial)
+    Serial.println("requesting data over i2c");
+  
   Wire.requestFrom( I2C_SLAVE, 1 );
 
-  int incoming_byte;
+  int8_t incoming_byte;
 
   while( Wire.available() )
   {
     incoming_byte = Wire.read();
   }
-
+  
   motor_next_update = millis() + MOTOR_UPDATE_INTERVALS;
+
+  return incoming_byte;
   
 }
 
