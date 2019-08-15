@@ -93,7 +93,7 @@ void setup() {
 
   // set all the outputs to LOW
   // to insure that all the outputs are not active when the controller starts :D
-  digitalWrite(PIEZO_OUT, LOW);
+  digitalWrite(PIEZO_OUTPUT, LOW);
   
   digitalWrite(MOTOR_L_OUTPUT, LOW);
   digitalWrite(MOTOR_C_OUTPUT, LOW);
