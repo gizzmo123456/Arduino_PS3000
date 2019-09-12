@@ -53,7 +53,11 @@
 #define POTENT_R_INPUT  A2
 
 // I2c
-#define I2C_SLAVE       0x08
+#define OUTPUT_BUFFER_SIZE  6
+#define I2C_SLAVE           0x08
+
+const unsigned int update_interval_length = 10;  //ms
+unsigned long next_update = 0;                    //ms
 
 const uint8_t TOTAL_INPUTS = 3;
 
@@ -62,12 +66,48 @@ uint16_t ldr[]    {0, 0, 0};
 uint16_t potent[] {0, 0, 0};
 
 // outputs (0 = Left, 1 = Center, 2 = Right)
+int8_t motor_current_value = 0;
 bool motor_active[]  {0, 0, 0};
 unsigned long motor_next_update = MOTOR_UPDATE_INTERVALS;
 bool fire_alarm_is_active = false;
 
 // Debug
 bool debug_serial = false;
+
+String GetPaddedString(int num)
+{
+  //define buffer and the final padded values
+  char buff[ OUTPUT_BUFFER_SIZE ];
+  char padded[ OUTPUT_BUFFER_SIZE + 1 ];
+  
+  bool neg = false; //remember if num is negitive
+
+  if(num < 0)       // make shore that the number is positive since we are converting unsigned int to char
+  {
+    num = -num;
+    neg = true;
+  }
+  
+  sprintf(buff, "%.5u", num); //Convert num to chars
+
+  // padd the buffer 
+  for(int i = 0; i < OUTPUT_BUFFER_SIZE; i++)
+    padded[i] = buff[i];
+
+  padded[OUTPUT_BUFFER_SIZE] = '\0';
+  if(neg) padded[0] = '-';  
+
+  String paddedStr = String(padded);
+
+  if (debug_serial)
+  {
+    Serial.print( String(padded) ); // Output the padded value to serial console :)
+    Serial.print("#");
+  }
+
+  return paddedStr;
+  
+}
 
 void setup() {
 
@@ -106,12 +146,16 @@ void setup() {
 void loop() 
 {
 
-  read_inputs();
-  update_outputs();
-  send_message_to_slave();
   
-  int8_t motor_value = request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
-  set_motors_active( motor_value );
+  //if( millis() > next_update )
+  //{
+    read_inputs();
+    request_data_from_slave();  // todo add method to be able to disable this. if another ardiuno is not connented
+    send_message_to_slave();
+  //  next_update = millis() + update_interval_length;
+  //}
+  set_motors_active( motor_current_value );
+  update_outputs();
   
   serial_debug();
   
@@ -120,8 +164,14 @@ void loop()
 void read_inputs()
 {
   // LDR
-
+  ldr[0] = analogRead(LDR_L_INPUT);
+  ldr[1] = analogRead(LDR_C_INPUT);
+  ldr[2] = analogRead(LDR_R_INPUT);
+  
   // Potent
+  potent[0] = analogRead(POTENT_L_INPUT);
+  potent[1] = analogRead(POTENT_C_INPUT);
+  potent[2] = analogRead(POTENT_R_INPUT);
   
 }
 
@@ -130,7 +180,8 @@ void update_outputs()
   
   // update fire feedback outputs
   
-  digitalWrite(MOTOR_L_OUTPUT, (motor_active[0] ? HIGH : LOW) );
+  //digitalWrite(MOTOR_L_OUTPUT, (motor_active[0] ? HIGH : LOW) );
+  analogWrite(MOTOR_L_OUTPUT, (motor_active[0] ? 165 : 0));//204 : 0) );
   digitalWrite(MOTOR_C_OUTPUT, (motor_active[1] ? HIGH : LOW));
   digitalWrite(MOTOR_R_OUTPUT, (motor_active[2] ? HIGH : LOW));
 
@@ -144,28 +195,52 @@ void update_outputs()
 void send_message_to_slave()
 {
   
+  if(debug_serial)
+    Serial.println("Sending Data Over i2c");
+
+  // Build our string to send over I2c
+  // Format: pentent[0], ldr[0], pentent[1], ldr[1], ...
+  String i2c_data = "";
+  for( int i = 0; i < 3; i++ )
+  {
+    i2c_data += GetPaddedString( ldr[i] );
+    i2c_data += GetPaddedString( potent[i] );
+  }
+
+  // Send the data :)
+  Wire.beginTransmission( I2C_SLAVE );
+  Wire.write( i2c_data.c_str() );  //TODO...
+  Wire.endTransmission();
+  
 }
 
-int8_t request_data_from_slave()
+void request_data_from_slave()
 {
 
-  if ( millis() > motor_next_update ) return;
+  if ( millis() < motor_next_update ) return;
 
   if(debug_serial)
     Serial.println("requesting data over i2c");
   
   Wire.requestFrom( I2C_SLAVE, 1 );
 
-  int8_t incoming_byte;
+  int8_t incoming = 0;
 
   while( Wire.available() )
   {
-    incoming_byte = Wire.read();
+    incoming = Wire.read();
   }
-  Serial.println(incoming_byte);
+  
+  if(debug_serial)
+  {
+    Serial.print( "Incming Byte: " );
+    Serial.println( incoming );
+  }
+  
   motor_next_update = millis() + MOTOR_UPDATE_INTERVALS;
 
-  return incoming_byte;
+  motor_current_value = incoming;
+  //return incoming;
   
 }
 
